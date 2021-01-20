@@ -1,0 +1,17 @@
+#!/bin/bash -e
+exit_handler()
+{
+	echo $?
+	local rc=$?
+	trap - EXIT
+	rm -R $name
+	exit $rc
+}
+trap exit_handler EXIT HUP INT QUIT PIPE TERM
+D=$(grep -e "Output:" 1.tex)
+D=${D##%Output:}
+name=$(mktemp -d tempXXX)
+i=' 1.tex'
+pdflatex -output-directory=$name -file-line-error -halt-on-error -jobname=$D <$i
+mv $name/$D.pdf ./$D.pdf
+
